@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  generation: 1
+  name: ingress
+spec:
+  rules:
+  - host: elasticsearch.{{ .Values.loadBalancer.dns }}
+    http:
+      paths:
+      - backend:
+          serviceName: elasticsearch
+          servicePort: rest-port
+  - host: kibana.{{ .Values.loadBalancer.dns }}
+    http:
+      paths:
+      - backend:
+          serviceName: kibana
+          servicePort: kibana-port
+  - host: logstash.{{ .Values.loadBalancer.dns }}
+    http:
+      paths:
+        - backend:
+            serviceName: logstash
+            servicePort: beast-port

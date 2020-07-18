@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch
+  labels:
+    app: elasticsearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      annotations:
+      {{- range $key, $value := .Values.annotations }}
+        {{ $key }}: {{ $value }}
+      {{- end }}
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+      - env:
+        - name: ES_JAVA_OPTS
+          value: {{ .Values.elasticsearch.java.opts }}
+        - name: ELASTIC_PASSWORD
+          value: changeme
+        - name: discovery.type
+          value: "single-node"
+        image: {{ .Values.elasticsearch.image }}:{{ .Values.elk.version }}
+        imagePullPolicy: IfNotPresent
+        name: elasticsearch
+        ports:
+          - name: rest-port
+            containerPort: 9200
+          - name: nodes-port
+            containerPort: 9300
+        resources:
+          limits:
+            memory: {{ .Values.elasticsearch.memory }}Mi
+            cpu:  {{ .Values.elasticsearch.cpu }}m
+          requests:
+            memory: {{ .Values.elasticsearch.memory }}Mi
+            cpu:  {{ .Values.elasticsearch.cpu }}m
+        securityContext:
+          capabilities: {}
+          runAsUser: {{ .Values.user.uid }}
+        volumeMounts:
+        - name: data-volume
+          mountPath: /usr/share/elasticsearch/data
+        - name: config-map
+          mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+          subPath: elasticsearch.yml
+      restartPolicy: Always
+      securityContext:
+        fsGroup: {{ .Values.user.uid }}
+      volumes:
+      - name: data-volume
+        hostPath:
+          path: {{ .Values.volume.path }}elasticsearch/data/
+          type: DirectoryOrCreate
+      - name: config-map
+        configMap:
+          name: elastic-config
+          defaultMode: 420
+          optional: false
+          items:
+            - key: elasticsearch.yml
+              mode: 420
+              path: elasticsearch.yml

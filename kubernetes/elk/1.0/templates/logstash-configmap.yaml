@@ -1,0 +1,24 @@
+apiVersion: v1
+data:
+  logstash.yml: |-
+    ---
+    http.host: "0.0.0.0"
+    xpack.monitoring.elasticsearch.hosts: [ "http://elasticsearch:9200" ]
+
+    ## X-Pack security credentials
+    #
+    xpack.monitoring.enabled: true
+    xpack.monitoring.elasticsearch.username: elastic
+    xpack.monitoring.elasticsearch.password: changeme
+  logstash.conf: "input {\n\tbeats {\n\t\tport => 5044\n\t}\n}\n\n\nfilter {\n\tif
+    [log][file][path] =~ \"haproxy\" {\n\t\tmutate { replace => { type => \"haproxy\"}
+    }\n\t\tgrok {\n\t\t\tmatch => { \"message\" => [\"%{SYSLOGTIMESTAMP:[@metadata][timestamp]}
+    %{GREEDYDATA:proxy}%{IP:client}_%{GREEDYDATA:useragent}\"]}\n\t\t}\n\t\tmutate
+    {\n\t\t\tremove_field => [\"offset\", \"proxy\", \"prospector\", \"[beat][name]\"
+    ]\n\t\t}\n\t\tdate {\n\t\t\tmatch => [\"[@metadata][timestamp]\", \"ISO8601\"]\n\t\t}\n
+    \ \t}\n}\n\n\n## Add your filters / logstash plugins configuration here\n\noutput
+    {\n\telasticsearch {\n\t\thosts => \"elasticsearch:9200\"\n\t\tuser => \"elastic\"\n\t\tpassword
+    => \"changeme\"\n\t}\n}"
+kind: ConfigMap
+metadata:
+  name: logstash-config

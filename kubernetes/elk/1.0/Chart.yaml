@@ -1,0 +1,7 @@
+description: ELK
+icon: https://objectstorage.sa-saopaulo-1.oraclecloud.com/p/6Jo41bOv1GHeGR3zmYQzVWrLKtEWN-N94eoqftmGQlE/n/grfo1sd2skos/b/jiva-temp/o/elk-icon.png
+name: elk
+version: 1.0
+maintainers:
+- email: highlander.dantas@sankhya.com.br
+  name: Highlander Dantas 

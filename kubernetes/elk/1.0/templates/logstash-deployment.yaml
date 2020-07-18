@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash
+  labels:
+    app: logstash
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      annotations:
+      {{- range $key, $value := .Values.annotations }}
+        {{ $key }}: {{ $value }}
+      {{- end }}
+      labels:
+        app: logstash
+    spec:
+      containers:
+      - env:
+        - name: LS_JAVA_OPTS
+          value: {{ .Values.logstash.java.opts }}
+        image: {{ .Values.logstash.image }}:{{ .Values.elk.version }}
+        name: logstash
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/share/logstash/config/logstash.yml
+          subPath: logstash.yml
+          readOnly: true
+        - name: pipeline-volume
+          mountPath: /usr/share/logstash/pipeline/logstash.conf
+          subPath: logstash.conf
+          readOnly: true
+      restartPolicy: Always
+      volumes:
+        - name: config-volume
+          configMap:
+            name: logstash-config
+            defaultMode: 420
+            optinal: false
+            items:
+            - key: logstash.yml
+              path: logstash.yml
+        - name: pipeline-volume
+          configMap:
+            name: logstash-config
+            defaultMode: 420
+            optinal: false
+            items:
+              - key: logstash.conf
+                path: logstash.conf

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  labels:
+    app: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      annotations:
+      {{- range $key, $value := .Values.annotations }}
+        {{ $key }}: {{ $value }}
+      {{- end }}
+      labels:
+        app: kibana
+    spec:
+      containers:
+      - name: kibana
+        image: {{ .Values.kibana.image }}:{{ .Values.elk.version }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: kibana-port
+          containerPort: 5601
+        volumeMounts:
+        - name: kibana-config
+          mountPath: /usr/share/kibana/config/kibana.yml
+          subPath: kibana.yml
+          readOnly: true
+      restartPolicy: Always
+      volumes:
+      - name: kibana-config
+        configMap:
+          name: kibana-config
+          defaultMode: 420
+          optinal: false
+          items:
+            - key: kibana.yml
+              path: kibana.yml

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: logstash
+  name: logstash
+spec:
+  ports:
+  - name: beast-port
+    port: 5044
+    targetPort: beast-port
+  - name: web-port
+    port: 9600
+    targetPort: web-port
+  selector:
+    app: logstash

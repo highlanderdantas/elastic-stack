@@ -1,0 +1,57 @@
+categories:
+- Monitoring
+labels:
+  io.rancher.certified: partner
+questions:
+- variable: elk.version
+  label: "Version to ELK"
+  default: "7.6.2"
+  type: string
+  required: true
+  group: "Configuration ELK"
+
+
+- variable: volume.path
+  label: "Path directory from ELK"
+  description: "Path directory from ELK"
+  default: "/home/mgeweb/compartilhado/elk/"
+  type: string
+  required: true
+  group: "Configuration ELK"
+
+- variable: loadBalancer.dns
+  label: "Domain application ingress"
+  description: "Domain application ingress"
+  default: "orcl.jivacloud.com.br"
+  type: string
+  required: true
+  group: "Configuration ELK"
+
+- variable: elasticsearch.cpu
+  label: "Limits cpu"
+  description: "Set the cpu limit"
+  default: 300
+  type: int
+  required: true
+  group: "Configuration Elasticsearch"
+
+- variable: elasticsearch.memory
+  label: "Limits memory"
+  description: "Set the memory limit"
+  default: 2048
+  type: int
+  required: true
+  group: "Configuration Elasticsearch"
+
+- variable: elasticsearch.java.opts
+  label: "WildFly boot memory"
+  description: "WildFly boot memory"
+  type: enum
+  default: "-Xms2g -Xmx2g"
+  options:
+    - "-Xms512m -Xmx512m"
+    - "-Xms1g -Xmx1g"
+    - "-Xms2g -Xmx2g"
+    - "-Xms4g -Xmx4g"
+  required: true
+  group: "Configuration Elasticsearch"
